@@ -103,17 +103,16 @@ class LibSimulation:
             if event[1] is EventType.FINISH:
                 free_worker = True
 
-            if free_worker:
-                if not waiting_persons.empty():
-                    person = waiting_persons.get()
-                    people_awaiting_time.append(actual_time - person)
-                    events.put(
-                        (
-                            np.random.exponential(self._service_delay) + actual_time,
-                            EventType.FINISH,
-                        )
+            if free_worker and not waiting_persons.empty():
+                person = waiting_persons.get()
+                people_awaiting_time.append(actual_time - person)
+                events.put(
+                    (
+                        np.random.exponential(self._service_delay) + actual_time,
+                        EventType.FINISH,
                     )
-                    free_worker = False
+                )
+                free_worker = False
 
         sum_t: float = 0.0
 
@@ -131,3 +130,8 @@ class LibSimulation:
             actual_time += np.random.poisson(self._person_delay)
 
         return arrives
+
+
+LibSimulationObj = LibSimulation(time=8, person_mean_delay=7.5, service_mean_delay=5)
+
+print(LibSimulationObj.simulate(days=100))
